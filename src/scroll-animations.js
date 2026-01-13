@@ -3,6 +3,7 @@ const prefersReducedMotion = window.matchMedia(
 ).matches;
 
 const revealElements = document.querySelectorAll("[data-reveal]");
+const canObserve = "IntersectionObserver" in window;
 
 if (!prefersReducedMotion && revealElements.length) {
   revealElements.forEach((element, index) => {
@@ -10,6 +11,13 @@ if (!prefersReducedMotion && revealElements.length) {
     const delay = element.dataset.revealDelay ?? String(index * 40);
     element.style.setProperty("--reveal-delay", `${delay}ms`);
   });
+
+  if (!canObserve) {
+    revealElements.forEach((element) =>
+      element.classList.add("reveal--visible"),
+    );
+    return;
+  }
 
   const observer = new IntersectionObserver(
     (entries, observerInstance) => {
